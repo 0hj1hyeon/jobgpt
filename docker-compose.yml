@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: jobgpt-postgres
+    environment:
+      POSTGRES_DB: jobgpt
+      POSTGRES_USER: jobgpt
+      POSTGRES_PASSWORD: jobgpt
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/init:/docker-entrypoint-initdb.d
+
+volumes:
+  postgres-data:

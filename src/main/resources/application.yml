@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: jobgpt
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/jobgpt}
+    username: ${DB_USERNAME:jobgpt}
+    password: ${DB_PASSWORD:jobgpt}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+
+discord:
+  bot:
+    token: ${DISCORD_BOT_TOKEN:}
+
+openai:
+  api-key: ${OPENAI_API_KEY:}
+  model: ${OPENAI_MODEL:gpt-4o-mini}
+
+logging:
+  level:
+    com.jobgpt: DEBUG

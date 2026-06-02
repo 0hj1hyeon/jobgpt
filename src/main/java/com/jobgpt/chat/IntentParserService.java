@@ -26,8 +26,19 @@ public class IntentParserService {
     private final ObjectMapper objectMapper;
 
     public JobSearchCondition parse(String message) {
-        String response = chatLanguageModel.generate(SYSTEM_PROMPT + "\nUser: " + message);
+        String response = generate(message);
         return toCondition(response);
+    }
+
+    private String generate(String message) {
+        try {
+            return chatLanguageModel.generate(SYSTEM_PROMPT + "\nUser: " + message);
+        } catch (RuntimeException e) {
+            throw new IllegalStateException(
+                    "Gemini API call failed. Check GEMINI_API_KEY and GEMINI_MODEL environment variables.",
+                    e
+            );
+        }
     }
 
     private JobSearchCondition toCondition(String response) {

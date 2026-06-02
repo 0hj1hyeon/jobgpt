@@ -17,11 +17,18 @@ spring:
 
 discord:
   bot:
+    enabled: ${DISCORD_BOT_ENABLED:true}
     token: ${DISCORD_BOT_TOKEN:}
 
-openai:
-  api-key: ${OPENAI_API_KEY:}
-  model: ${OPENAI_MODEL:gpt-4o-mini}
+gemini:
+  api-key: ${GEMINI_API_KEY:}
+  model: ${GEMINI_MODEL:gemini-2.5-flash}
+
+jobgpt:
+  test-message:
+    enabled: ${JOBGPT_TEST_MESSAGE_ENABLED:false}
+    search-enabled: ${JOBGPT_TEST_SEARCH_ENABLED:false}
+    input: ${JOBGPT_TEST_MESSAGE_INPUT:서울 신입 Java 백엔드 공고 찾아줘}
 
 logging:
   level:

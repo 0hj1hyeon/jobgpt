@@ -2,8 +2,8 @@ package com.jobgpt.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "openai")
-public record OpenAiConfig(
+@ConfigurationProperties(prefix = "gemini")
+public record GeminiConfig(
         String apiKey,
         String model
 ) {

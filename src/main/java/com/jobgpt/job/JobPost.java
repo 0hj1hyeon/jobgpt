@@ -5,11 +5,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -44,6 +47,9 @@ public class JobPost {
 
     private String deadline;
 
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
     public JobPost(
             String source,
             String externalId,
@@ -64,16 +70,8 @@ public class JobPost {
         this.deadline = deadline;
     }
 
-    public void updateDetailsFrom(JobPost post) {
-        this.title = prefer(post.title, this.title);
-        this.company = prefer(post.company, this.company);
-        this.location = prefer(post.location, this.location);
-        this.experience = prefer(post.experience, this.experience);
-        this.url = prefer(post.url, this.url);
-        this.deadline = prefer(post.deadline, this.deadline);
-    }
-
-    private String prefer(String next, String current) {
-        return next == null || next.isBlank() ? current : next;
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
     }
 }

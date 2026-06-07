@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jobgpt.job.JobSearchCondition;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class IntentParserService {
@@ -26,8 +28,11 @@ public class IntentParserService {
     private final ObjectMapper objectMapper;
 
     public JobSearchCondition parse(String message) {
+        log.info("Parsing job search intent with Gemini.");
         String response = generate(message);
-        return toCondition(response);
+        JobSearchCondition condition = toCondition(response);
+        log.info("Gemini response parsed into JobSearchCondition: {}", condition.toJson());
+        return condition;
     }
 
     private String generate(String message) {

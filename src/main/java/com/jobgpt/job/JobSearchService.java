@@ -50,12 +50,13 @@ public class JobSearchService {
     }
 
     private JobPost saveIfAbsent(JobPost post) {
-        return jobPostRepository.findBySourceAndExternalId(post.getSource(), post.getExternalId())
-                .map(existing -> {
-                    existing.updateDetailsFrom(post);
-                    return existing;
-                })
-                .orElseGet(() -> saveNew(post));
+        if (jobPostRepository.existsBySourceAndExternalId(post.getSource(), post.getExternalId())) {
+            log.debug("Job post already exists. source={}, externalId={}", post.getSource(), post.getExternalId());
+            return jobPostRepository.findBySourceAndExternalId(post.getSource(), post.getExternalId())
+                    .orElseThrow(() -> new IllegalStateException("Job post exists but could not be loaded."));
+        }
+
+        return saveNew(post);
     }
 
     private JobPost saveNew(JobPost post) {

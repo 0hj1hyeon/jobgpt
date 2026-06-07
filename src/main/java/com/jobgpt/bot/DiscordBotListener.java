@@ -34,6 +34,7 @@ public class DiscordBotListener extends ListenerAdapter {
         log.info("Discord message received. author={}, message={}", event.getAuthor().getName(), message);
 
         try {
+            log.info("Calling IntentParserService for Discord message.");
             JobSearchCondition condition = intentParserService.parse(message);
             log.info("Parsed job search condition: {}", condition);
 

@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_job_post_source_external_id", columnNames = {"source", "externalId"})
+                @UniqueConstraint(name = "uk_job_post_source_external_id", columnNames = {"source", "external_id"})
         }
 )
 public class JobPost {
@@ -31,6 +31,7 @@ public class JobPost {
     @Column(length = 30)
     private String source;
 
+    @Column(name = "external_id")
     private String externalId;
 
     @Column(nullable = false)
@@ -47,7 +48,7 @@ public class JobPost {
 
     private String deadline;
 
-    @Column(updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     public JobPost(

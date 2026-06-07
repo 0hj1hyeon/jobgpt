@@ -36,7 +36,7 @@ Discord 메시지를 수신하면 콘솔에 다음 흐름의 로그가 출력됩
 Discord message received
 Calling IntentParserService for Discord message.
 Parsing job search intent with Gemini.
-Gemini response parsed into JobSearchCondition
+Gemini response parsed into ChatIntent
 ```
 
 Discord에서 다음처럼 입력하면 Gemini가 검색 조건 JSON으로 변환하고, 봇이 채널에 JSON을 응답합니다.
@@ -175,6 +175,63 @@ having count(*) > 1;
 
 결과가 없으면 중복 저장이 발생하지 않은 상태입니다.
 
+### Step 4: Subscription notifications
+
+Discord에서 자연어로 알림을 등록, 조회, 삭제할 수 있습니다. Gemini가 메시지를 아래 의도로 분류합니다.
+
+- `SEARCH_JOB`: 채용공고 검색
+- `CREATE_SUBSCRIPTION`: 알림 등록
+- `LIST_SUBSCRIPTION`: 내 알림 목록 조회
+- `DELETE_SUBSCRIPTION`: 내 활성 알림 삭제
+
+사용 예시:
+
+```text
+서울 신입 백엔드 공고 찾아줘
+서울 신입 백엔드 공고 매일 알려줘
+내 알림 목록 보여줘
+알림 삭제해줘
+```
+
+구독 정보는 `subscription` 테이블에 저장됩니다.
+
+저장 필드:
+
+- `id`
+- `discordUserId`
+- `discordChannelId`
+- `keyword`
+- `location`
+- `experience`
+- `active`
+- `createdAt`
+
+스케줄러는 `active=true` 구독을 주기적으로 확인합니다. 구독 조건으로 채용공고를 다시 검색하고, 아직 해당 사용자에게 보내지 않은 공고만 Discord 채널로 전송합니다.
+
+발송 이력은 `sent_notifications` 테이블에 저장됩니다.
+
+저장 필드:
+
+- `id`
+- `discordUserId`
+- `jobPostId`
+- `sentAt`
+
+중복 알림 방지 구조:
+
+- `sent_notifications`에 `discordUserId + jobPostId` unique 제약조건을 둡니다.
+- 스케줄러는 발송 전 `existsByDiscordUserIdAndJobPostId`로 이미 보낸 공고인지 확인합니다.
+- 이미 보낸 공고는 다시 전송하지 않습니다.
+
+스케줄러 설정:
+
+```dotenv
+JOBGPT_NOTIFICATION_ENABLED=true
+JOBGPT_NOTIFICATION_FIXED_DELAY_MS=3600000
+```
+
+기본 주기는 1시간입니다. 개발 중 빠르게 확인하려면 `JOBGPT_NOTIFICATION_FIXED_DELAY_MS=60000`처럼 줄일 수 있습니다.
+
 ### Required environment variables
 
 - `GEMINI_API_KEY`: Gemini API 호출에 필요합니다.
@@ -187,6 +244,8 @@ having count(*) > 1;
 - `JOBGPT_TEST_MESSAGE_ENABLED`: 기본값은 `false`
 - `JOBGPT_TEST_SEARCH_ENABLED`: 기본값은 `false`
 - `JOBGPT_TEST_MESSAGE_INPUT`: 테스트 입력 문장
+- `JOBGPT_NOTIFICATION_ENABLED`: 기본값은 `true`
+- `JOBGPT_NOTIFICATION_FIXED_DELAY_MS`: 기본값은 `3600000`
 
 ## Current Features
 
@@ -196,4 +255,7 @@ having count(*) > 1;
 - `source + externalId` unique 제약조건으로 중복 저장 방지
 - PostgreSQL 저장 전 `existsBySourceAndExternalId`로 기존 공고 확인
 - 여러 크롤러 결과 병합 후 상위 5개 Discord 출력
+- Discord 자연어 알림 등록/조회/삭제
+- 스케줄러 기반 신규 공고 자동 알림
+- `sent_notifications` 이력 기반 중복 알림 방지
 - 크롤러별 실패 격리 및 로그 출력

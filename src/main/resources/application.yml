@@ -29,6 +29,9 @@ jobgpt:
     enabled: ${JOBGPT_TEST_MESSAGE_ENABLED:false}
     search-enabled: ${JOBGPT_TEST_SEARCH_ENABLED:false}
     input: ${JOBGPT_TEST_MESSAGE_INPUT:서울 신입 Java 백엔드 공고 찾아줘}
+  notification:
+    enabled: ${JOBGPT_NOTIFICATION_ENABLED:true}
+    fixed-delay-ms: ${JOBGPT_NOTIFICATION_FIXED_DELAY_MS:3600000}
 
 logging:
   level:
